@@ -26,7 +26,7 @@ server.listen(8080,function check(error) {
 
 //Create the Records
 
-server.post("/api/sabari/employee/add", (req, res) => {
+server.post("/api/employee/add", (req, res) => {
     let details = {
       user_name: req.body.name,
       code: req.body.code,
@@ -81,7 +81,7 @@ server.put("/api/employee/edit/:id", (req, res) => {
       req.body.password + "'  WHERE id=" + req.params.id;
     let a = db.query(sql, (error, result) => {
       if(error) res.send({ status: false, message: "Employee Not Getting Updated" });
-      else res.send({ status: true, message: "Employee Updated successfully" });
+      else res.send({ status: true, message: "Employee Updated successfully",data:result});
     });
   });
 
@@ -94,5 +94,76 @@ server.put("/api/employee/edit/:id", (req, res) => {
     let query = db.query(sql, (error) => {
       if (error) res.send({ status: false, message: "Employee not Deleted" });
        else res.send({ status: true, message: "Employee Deleted successfully" });
+    });
+  });
+
+  server.post("/api/customer/add", (req, res) => {
+    let details = {
+      customer_name: req.body.name,
+      customer_code: req.body.code,
+      mobile_number: req.body.mobile_number,
+      password: req.body.password,
+      created_at: "0000-00-00",
+      updated_at: "0000-00-00",
+      created_by: 1
+    };
+    let sql = "INSERT INTO mpay_customer_details SET ?";
+    db.query(sql, details, (error) => {
+      if (error) res.send({ status: false, message: "Not able to create this Customer" });
+      else res.send({ status: true, message: "Customer created successfully" });
+      });
+  });
+
+//view the Records
+
+server.get("/api/customer/view", (req, res) => {
+    var sql = "SELECT * FROM mpay_customer_details";
+    db.query(sql, function (error, result) {
+      if (error) {
+        console.log("Somthing went wrong");
+      } else {
+        res.send({ status: true, data: result });
+      }
+    });
+  });
+
+
+//Search the Records
+
+server.get("/api/customer/search/:id", (req, res) => {
+    var cus_id = req.params.id;
+    var sql = "SELECT * FROM mpay_customer_details WHERE id=" + cus_id;
+    db.query(sql, function (error, result) {
+      if (error) {
+        console.log("Somthing went wrong");
+      } else {
+        res.send({ status: true, data: result });
+      }
+    });
+  });
+
+
+
+//Update the Records
+
+server.put("/api/customer/edit/:id", (req, res) => {
+    let sql =
+      "UPDATE mpay_customer_details SET user_name='" + req.body.name + "', code='" + req.body.code + "',mobile_number='" + req.body.mobile_number + "',password='" +
+      req.body.password + "'  WHERE id=" + req.params.id;
+    let a = db.query(sql, (error, result) => {
+      if(error) res.send({ status: false, message: "Customer Not Getting Updated" });
+      else res.send({ status: true, message: "Customer Updated successfully" ,data:result});
+    });
+  });
+
+
+
+  //Delete the Records
+  
+  server.delete("/api/customer/delete/:id", (req, res) => {
+    let sql = "DELETE FROM mpay_customer_details WHERE id=" + req.params.id + "";
+    let query = db.query(sql, (error) => {
+      if (error) res.send({ status: false, message: "customer not Deleted" });
+       else res.send({ status: true, message: "customer Deleted successfully" });
     });
   });
